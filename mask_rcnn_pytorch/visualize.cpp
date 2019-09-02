@@ -14,14 +14,14 @@ void visualize(const cv::Mat& image,
   cv::Mat img = image.clone();
   auto n = boxes.size(0);
   for (int64_t i = 0; i < n; ++i) {
-    auto score = *scores[i].data<float>();
+    auto score = *scores[i].data_ptr<float>();
     if (score >= score_threshold) {
       auto bbox = boxes[i];
-      auto y1 = *bbox[0].data<int32_t>();
-      auto x1 = *bbox[1].data<int32_t>();
-      auto y2 = *bbox[2].data<int32_t>();
-      auto x2 = *bbox[3].data<int32_t>();
-      auto class_id = *class_ids[i].data<int64_t>();
+      auto y1 = *bbox[0].data_ptr<int32_t>();
+      auto x1 = *bbox[1].data_ptr<int32_t>();
+      auto y2 = *bbox[2].data_ptr<int32_t>();
+      auto x2 = *bbox[3].data_ptr<int32_t>();
+      auto class_id = *class_ids[i].data_ptr<int64_t>();
 
       cv::Mat bin_mask = masks[i].clone();
       cv::Mat mask_ch[3];

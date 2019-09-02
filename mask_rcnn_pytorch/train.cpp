@@ -83,9 +83,11 @@ int main(int argc, char** argv) {
       LoadStateDictJson(*model, params_path);
     } else {
       // Uncoment to load only resnet
-      //      std::string ignore_layers =
-      //          "(fpn.P5\\_.*)|(fpn.P4\\_.*)|(fpn.P3\\_.*)|(fpn.P2\\_.*)|(rpn.*)|("
-      //          "classifier.*)|(mask.*)";
+      // std::string ignore_layers =
+      //     "(fpn.P5\\_.*)|(fpn.P4\\_.*)|(fpn.P3\\_.*)|(fpn.P2\\_.*)|(rpn.*)|("
+      //     "classifier.*)|(mask.*)";
+      // std::string ignore_layers =
+      //     "(classifier.*)|(mask.*)";
       std::string ignore_layers{""};
       LoadStateDict(*model, params_path, ignore_layers);
     }
@@ -105,13 +107,13 @@ int main(int argc, char** argv) {
         fs::path(data_path) / "annotations/instances_val2017.json");
     auto val_set = std::make_unique<CocoDataset>(std::move(val_loader), config);
 
-    //    // Training - Stage 1
+    // Training - Stage 1
     std::cout << "Training network heads" << std::endl;
     model->Train(*train_set, *val_set, config->learning_rate, /*epochs*/
                  40,
                  "heads");  // 40
 
-    //    // Training - Stage 2
+    // Training - Stage 2
     std::cout << "Fine tune Resnet stage 4 and up" << std::endl;
     model->Train(*train_set, *val_set, config->learning_rate, /*epochs*/
                  120,

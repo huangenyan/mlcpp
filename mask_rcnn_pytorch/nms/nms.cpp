@@ -14,13 +14,13 @@ int cpu_nms(at::Tensor keep_out,
   int64_t boxes_num = boxes.size(0);
   int64_t boxes_dim = boxes.size(1);
 
-  int64_t* keep_out_flat = keep_out.contiguous().data<int64_t>();
-  float* boxes_flat = boxes.contiguous().data<float>();
-  int64_t* order_flat = order.contiguous().data<int64_t>();
-  float* areas_flat = areas.contiguous().data<float>();
+  int64_t* keep_out_flat = keep_out.contiguous().data_ptr<int64_t>();
+  float* boxes_flat = boxes.contiguous().data_ptr<float>();
+  int64_t* order_flat = order.contiguous().data_ptr<int64_t>();
+  float* areas_flat = areas.contiguous().data_ptr<float>();
 
   at::Tensor suppressed = at::zeros({boxes_num}, at::CPU(at::kByte));
-  unsigned char* suppressed_flat = suppressed.data<unsigned char>();
+  unsigned char* suppressed_flat = suppressed.data_ptr<unsigned char>();
 
   // nominal indices
   int i, j;
@@ -64,7 +64,7 @@ int cpu_nms(at::Tensor keep_out,
     }
   }
 
-  int64_t* num_out_flat = num_out.contiguous().data<int64_t>();
+  int64_t* num_out_flat = num_out.contiguous().data_ptr<int64_t>();
   *num_out_flat = num_to_keep;
   return 1;
 }

@@ -128,11 +128,11 @@ void crop_and_resize_forward(at::Tensor image,
 
   // crop_and_resize for each box
   CropAndResizePerBox(
-      image.data<float>(), batch_size, depth, image_height, image_width,
+      image.data_ptr<float>(), batch_size, depth, image_height, image_width,
 
-      boxes.data<float>(), box_index.data<int>(), 0, num_boxes,
+      boxes.data_ptr<float>(), box_index.data_ptr<int>(), 0, num_boxes,
 
-      crops.data<float>(), crop_height, crop_width, extrapolation_value);
+      crops.data_ptr<float>(), crop_height, crop_width, extrapolation_value);
 }
 
 void crop_and_resize_backward(
@@ -162,10 +162,10 @@ void crop_and_resize_backward(
   grads_image.zero_();
 
   // data pointer
-  const float* grads_data = grads.data<float>();
-  const float* boxes_data = boxes.data<float>();
-  const int* box_index_data = box_index.data<int>();
-  float* grads_image_data = grads_image.data<float>();
+  const float* grads_data = grads.data_ptr<float>();
+  const float* boxes_data = boxes.data_ptr<float>();
+  const int* box_index_data = box_index.data_ptr<int>();
+  float* grads_image_data = grads_image.data_ptr<float>();
 
   for (int b = 0; b < num_boxes; ++b) {
     const float* box = boxes_data + b * 4;

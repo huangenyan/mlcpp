@@ -23,22 +23,22 @@ int gpu_nms(at::Tensor keep,
   int boxes_num = boxes.size(0);
   int boxes_dim = boxes.size(1);
 
-  float* boxes_flat = boxes.contiguous().data<float>();
+  float* boxes_flat = boxes.contiguous().data_ptr<float>();
 
   const int col_blocks = DIVUP(boxes_num, threadsPerBlock);
   at::Tensor mask = at::empty({boxes_num, col_blocks}, at::CUDA(at::kLong));
-  int64_t* mask_flat = mask.data<int64_t>();
+  int64_t* mask_flat = mask.data_ptr<int64_t>();
 
   _nms(boxes_num, boxes_flat, mask_flat, nms_overlap_thresh);
 
   at::Tensor mask_cpu = mask.toBackend(at::Backend::CPU);
 
-  int64_t* mask_cpu_flat = mask_cpu.data<int64_t>();
+  int64_t* mask_cpu_flat = mask_cpu.data_ptr<int64_t>();
 
   at::Tensor remv_cpu = at::zeros({col_blocks}, at::CPU(at::kLong));
-  int64_t* remv_cpu_flat = remv_cpu.data<int64_t>();
+  int64_t* remv_cpu_flat = remv_cpu.data_ptr<int64_t>();
 
-  int64_t* keep_flat = keep.data<int64_t>();
+  int64_t* keep_flat = keep.data_ptr<int64_t>();
   int64_t num_to_keep = 0;
 
   int i, j;
@@ -55,7 +55,7 @@ int gpu_nms(at::Tensor keep,
     }
   }
 
-  int64_t* num_out_flat = num_out.data<int64_t>();
+  int64_t* num_out_flat = num_out.data_ptr<int64_t>();
   *num_out_flat = num_to_keep;
 
   return 1;

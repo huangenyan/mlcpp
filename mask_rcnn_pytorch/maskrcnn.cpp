@@ -145,7 +145,7 @@ void MaskRCNNImpl::Train(CocoDataset train_dataset,
 
 std::tuple<float, float, float, float, float, float> MaskRCNNImpl::ValidEpoch(
     StatReporter& reporter,
-    torch::data::DataLoader<CocoDataset, torch::data::samplers::RandomSampler>&
+    torch::data::StatelessDataLoader<CocoDataset, torch::data::samplers::RandomSampler>&
         datagenerator,
     uint32_t steps) {
   float loss_sum = 0;
@@ -192,12 +192,12 @@ std::tuple<float, float, float, float, float, float> MaskRCNNImpl::ValidEpoch(
                 mrcnn_bbox_loss + mrcnn_mask_loss;
 
     // Progress
-    auto loss_ = loss.cpu().data<float>()[0];
-    auto loss_rpn_class = rpn_class_loss.cpu().data<float>()[0];
-    auto loss_rpn_bbox = rpn_bbox_loss.cpu().data<float>()[0];
-    auto loss_mrcnn_class = mrcnn_class_loss.cpu().data<float>()[0];
-    auto loss_mrcnn_bbox = mrcnn_bbox_loss.cpu().data<float>()[0];
-    auto loss_mrcnn_mask = mrcnn_mask_loss.cpu().data<float>()[0];
+    auto loss_ = loss.cpu().data_ptr<float>()[0];
+    auto loss_rpn_class = rpn_class_loss.cpu().data_ptr<float>()[0];
+    auto loss_rpn_bbox = rpn_bbox_loss.cpu().data_ptr<float>()[0];
+    auto loss_mrcnn_class = mrcnn_class_loss.cpu().data_ptr<float>()[0];
+    auto loss_mrcnn_bbox = mrcnn_bbox_loss.cpu().data_ptr<float>()[0];
+    auto loss_mrcnn_mask = mrcnn_mask_loss.cpu().data_ptr<float>()[0];
     reporter.ReportValidationStep(
         step, {loss_, loss_rpn_class, loss_rpn_bbox, loss_mrcnn_class,
                loss_mrcnn_bbox, loss_mrcnn_mask});
@@ -226,7 +226,7 @@ std::tuple<float, float, float, float, float, float> MaskRCNNImpl::ValidEpoch(
 
 std::tuple<float, float, float, float, float, float> MaskRCNNImpl::TrainEpoch(
     StatReporter& reporter,
-    torch::data::DataLoader<CocoDataset, torch::data::samplers::RandomSampler>&
+    torch::data::StatelessDataLoader<CocoDataset, torch::data::samplers::RandomSampler>&
         datagenerator,
     torch::optim::SGD& optimizer,
     torch::optim::SGD& optimizer_bn,
@@ -293,12 +293,12 @@ std::tuple<float, float, float, float, float, float> MaskRCNNImpl::TrainEpoch(
     }
 
     // Progress
-    auto loss_ = loss.cpu().data<float>()[0];
-    auto loss_rpn_class = rpn_class_loss.cpu().data<float>()[0];
-    auto loss_rpn_bbox = rpn_bbox_loss.cpu().data<float>()[0];
-    auto loss_mrcnn_class = mrcnn_class_loss.cpu().data<float>()[0];
-    auto loss_mrcnn_bbox = mrcnn_bbox_loss.cpu().data<float>()[0];
-    auto loss_mrcnn_mask = mrcnn_mask_loss.cpu().data<float>()[0];
+    auto loss_ = loss.cpu().data_ptr<float>()[0];
+    auto loss_rpn_class = rpn_class_loss.cpu().data_ptr<float>()[0];
+    auto loss_rpn_bbox = rpn_bbox_loss.cpu().data_ptr<float>()[0];
+    auto loss_mrcnn_class = mrcnn_class_loss.cpu().data_ptr<float>()[0];
+    auto loss_mrcnn_bbox = mrcnn_bbox_loss.cpu().data_ptr<float>()[0];
+    auto loss_mrcnn_mask = mrcnn_mask_loss.cpu().data_ptr<float>()[0];
     reporter.ReportTrainStep(
         step, {loss_, loss_rpn_class, loss_rpn_bbox, loss_mrcnn_class,
                loss_mrcnn_bbox, loss_mrcnn_mask});

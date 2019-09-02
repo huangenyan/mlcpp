@@ -71,15 +71,7 @@ at::Tensor RefineDetections(at::Tensor rois,
     keep_bool = keep_bool * (class_scores >= config.detection_min_confidence);
   }
 
-  auto keep = torch::nonzero(keep_bool)
-                  .narrow(1, 0, 1)
-                  .to(at::dtype(at::kLong))
-                  .squeeze();
-
-  // Unsqueeze in case keep is a 0-dimensional tensor
-  // otherwise calls like nms_class_ids.size(0) will fail
-  if (keep.ndimension() == 0)
-      keep = keep.unsqueeze(0);
+  auto keep = torch::nonzero(keep_bool).squeeze(1);
 
   // Apply per-class NMS
   auto pre_nms_class_ids = class_ids.take(keep);
@@ -95,17 +87,16 @@ at::Tensor RefineDetections(at::Tensor rois,
     auto class_id = nms_class_ids[i];
     //    // Pick detections of this class
     auto ixs =
-        torch::nonzero(pre_nms_class_ids == class_id).narrow(1, 0, 1).squeeze();
-
+        torch::nonzero(pre_nms_class_ids == class_id).squeeze(1);
     // Sort
     auto ix_rois = pre_nms_rois.index_select(0, ixs);
 
     auto ix_scores = pre_nms_scores.index_select(0, ixs);
     at::Tensor order;
-    std::tie(ix_scores, order) =
-        ix_scores.unsqueeze(1).sort(0, /*descending*/ true);
-    order = order.squeeze();
+    std::tie(ix_scores, order) = ix_scores.sort(0, /*descending*/ true);
+
     ix_rois = ix_rois.index_select(0, order);
+    ix_scores = ix_scores.unsqueeze(1);
 
     auto class_keep = Nms(torch::cat({ix_rois, ix_scores}, /*dim*/ 1),
                           config.detection_nms_threshold);

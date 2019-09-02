@@ -60,7 +60,7 @@ class MaskRCNNImpl : public torch::nn::Module {
   std::string GetCheckpointPath(uint32_t epoch) const;
   std::tuple<float, float, float, float, float, float> TrainEpoch(
       StatReporter& reporter,
-      torch::data::DataLoader<CocoDataset,
+      torch::data::StatelessDataLoader<CocoDataset,
                               torch::data::samplers::RandomSampler>&
           datagenerator,
       torch::optim::SGD& optimizer,
@@ -68,7 +68,7 @@ class MaskRCNNImpl : public torch::nn::Module {
       uint32_t steps);
   std::tuple<float, float, float, float, float, float> ValidEpoch(
       StatReporter& reporter,
-      torch::data::DataLoader<CocoDataset,
+      torch::data::StatelessDataLoader<CocoDataset,
                               torch::data::samplers::RandomSampler>&
           datagenerator,
       uint32_t steps);

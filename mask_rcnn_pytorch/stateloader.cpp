@@ -188,12 +188,6 @@ void LoadStateDictJson(torch::nn::Module& module,
 
     for (auto& val : new_params) {
       auto name = val.key();
-      // fix naming
-      auto pos = name.find("running_var");
-      if (pos != std::string::npos) {
-        name.replace(pos, 11, "running_variance");
-      }
-
       auto* t = params.find(name);
       if (t != nullptr) {
         std::cout << name << " copy\n";

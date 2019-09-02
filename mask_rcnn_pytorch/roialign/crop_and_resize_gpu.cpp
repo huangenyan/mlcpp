@@ -27,10 +27,10 @@ void crop_and_resize_gpu_forward(
   crops.zero_();
 
   CropAndResizeLaucher(
-      image.contiguous().data<float>(), boxes.contiguous().data<float>(),
-      box_index.contiguous().data<int>(), num_boxes, batch_size, image_height,
+      image.contiguous().data_ptr<float>(), boxes.contiguous().data_ptr<float>(),
+      box_index.contiguous().data_ptr<int>(), num_boxes, batch_size, image_height,
       image_width, crop_height, crop_width, depth, extrapolation_value,
-      crops.data<float>());
+      crops.data_ptr<float>());
 }
 
 void crop_and_resize_gpu_backward(
@@ -53,7 +53,7 @@ void crop_and_resize_gpu_backward(
   grads_image.zero_();
 
   CropAndResizeBackpropImageLaucher(
-      grads.data<float>(), boxes.data<float>(), box_index.data<int>(),
+      grads.data_ptr<float>(), boxes.data_ptr<float>(), box_index.data_ptr<int>(),
       num_boxes, batch_size, image_height, image_width, crop_height, crop_width,
-      depth, grads_image.data<float>());
+      depth, grads_image.data_ptr<float>());
 }

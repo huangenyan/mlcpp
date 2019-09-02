@@ -75,7 +75,7 @@ std::tuple<at::Tensor, at::Tensor, at::Tensor, at::Tensor> DetectionTargetLayer(
     {
       auto deltas_data = BoxRefinement(positive_rois, roi_gt_boxes);
       deltas =
-          torch::from_blob(deltas_data.cpu().data<float>(), deltas_data.sizes(),
+          torch::from_blob(deltas_data.cpu().data_ptr<float>(), deltas_data.sizes(),
                            at::dtype(at::kFloat).requires_grad(false))
               .clone();
     }

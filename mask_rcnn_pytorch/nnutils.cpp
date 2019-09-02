@@ -80,10 +80,9 @@ at::Tensor unique1d(at::Tensor tensor) {
   if (tensor.size(0) == 0 || tensor.size(0) == 1)
     return tensor;
   std::tie(tensor, std::ignore) = tensor.sort();
-  auto unique_bool = tensor.narrow(0, 1, tensor.size(0) - 1) !=
-                     tensor.narrow(0, 0, tensor.size(0) - 1);
-  auto first_element =
-      torch::tensor({1}, at::dtype(at::kByte).requires_grad(false));
+  auto unique_bool = (tensor.narrow(0, 1, tensor.size(0) - 1) !=
+                     tensor.narrow(0, 0, tensor.size(0) - 1));
+  auto first_element = torch::tensor({1}, torch::requires_grad(false)).to(torch::kBool);
   if (tensor.is_cuda())
     first_element = first_element.cuda();
   unique_bool = torch::cat({first_element, unique_bool}, /*dim*/ 0);

@@ -137,17 +137,17 @@ cv::Mat UnmoldMask(at::Tensor mask,
                    at::Tensor bbox,
                    const cv::Size& image_shape,
                    double threshold) {
-  auto y1 = *bbox[0].data<int32_t>();
-  auto x1 = *bbox[1].data<int32_t>();
-  auto y2 = *bbox[2].data<int32_t>();
-  auto x2 = *bbox[3].data<int32_t>();
+  auto y1 = *bbox[0].data_ptr<int32_t>();
+  auto x1 = *bbox[1].data_ptr<int32_t>();
+  auto y2 = *bbox[2].data_ptr<int32_t>();
+  auto x2 = *bbox[3].data_ptr<int32_t>();
 
   if ((mask > 0).nonzero().numel() == 0) {
     std::cerr << "Empty mask detected!";
   }
 
   cv::Mat cv_mask(static_cast<int>(mask.size(0)),
-                  static_cast<int>(mask.size(1)), CV_32FC1, mask.data<float>());
+                  static_cast<int>(mask.size(1)), CV_32FC1, mask.data_ptr<float>());
   cv::resize(cv_mask, cv_mask, cv::Size(x2 - x1, y2 - y1));
   cv::threshold(cv_mask, cv_mask, threshold, 1, cv::THRESH_BINARY);
   cv_mask *= 255;
@@ -171,7 +171,7 @@ UnmoldDetections(at::Tensor detections,
   if (zero_ix.size(0) > 0)
     zero_ix = zero_ix[0];
   auto N =
-      zero_ix.size(0) > 0 ? *zero_ix[0].data<uint8_t>() : detections.size(0);
+      zero_ix.size(0) > 0 ? *zero_ix[0].data_ptr<uint8_t>() : detections.size(0);
 
   //  Extract boxes, class_ids, scores, and class-specific masks
   auto boxes = detections.narrow(0, 0, N).narrow(1, 0, 4);
@@ -210,10 +210,10 @@ UnmoldDetections(at::Tensor detections,
     scores = scores.index_select(0, include_ix).reshape({N, -1});
     masks = masks.index_select(0, include_ix);
   } else {
-    boxes = torch::empty({}, boxes.options());
-    class_ids = torch::empty({}, class_ids.options());
-    scores = torch::empty({}, scores.options());
-    masks = torch::empty({}, masks.options());
+    boxes = torch::empty({0, boxes.size(1)}, boxes.options());
+    class_ids = torch::empty({0, 4}, class_ids.options());
+    scores = torch::empty({0, 1}, scores.options());
+    masks = torch::empty({0, masks.size(1), masks.size(2)}, masks.options());
     N = 0;
   }
   // Resize masks to original image size and set boundary threshold.
